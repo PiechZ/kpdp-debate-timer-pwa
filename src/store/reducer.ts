@@ -1,11 +1,18 @@
 import { StoreAction, StoreContent } from './types';
-import { Screen, screens, TimeSlot } from '../types';
+import {
+  Screen, screens, TimeSlot, TimeSlotConfig,
+} from '../types';
 import { createInitialStore } from './initialStore';
 import { activateThemeColour } from '../themes';
 import { setActiveOption } from '../localStorage';
 import { getLinearTimeSlots } from '../components/ModeLinear/getters';
 import { getActiveStoreFormat, getActiveStoreLanguage } from './getters';
 import { Format } from '../formats';
+import { Language } from '../languages';
+import {
+  getFormatConfigs, buildThemeOptions, buildModeOptions, buildFormatOptions, buildLanguageOptions,
+} from '../config';
+import getLocalisation from '../localisation';
 
 const setScreen = (
   store: StoreContent,
@@ -73,6 +80,31 @@ const setPendingFormat = (store: StoreContent, value: string | null): StoreConte
   ...store,
   pendingFormat: value,
 });
+
+const relabelSlots = <T extends TimeSlot>(current: T[], fresh: TimeSlotConfig[]): T[] => (
+  current.map((slot) => {
+    const match = fresh.find((f) => f.id === slot.id)!;
+    return { ...slot, label: match.label, labelSuffix: match.labelSuffix };
+  })
+);
+
+const setLanguage = (store: StoreContent, value: string): StoreContent => {
+  setActiveOption('language', value);
+  const language = value as Language;
+  const t = getLocalisation(language);
+  const format = getActiveStoreFormat(store);
+  const { speakers, prepTimes } = getFormatConfigs(language)[format];
+
+  return {
+    ...store,
+    languages: buildLanguageOptions(value),
+    themes: buildThemeOptions(t, store.themes.find((i) => i.active)!.value),
+    modes: buildModeOptions(t, store.modes.find((i) => i.active)!.value),
+    formats: buildFormatOptions(t, store.formats.find((i) => i.active)!.value),
+    speakers: store.speakers.map((party, i) => relabelSlots(party, speakers[i])),
+    prepTimes: relabelSlots(store.prepTimes, prepTimes),
+  };
+};
 
 const toggleActiveTimeSlot = (
   slot: TimeSlot,
@@ -218,6 +250,8 @@ const reducer = (store: StoreContent, action: StoreAction): StoreContent => {
       return setFormat(store, action.payload);
     case 'SET_PENDING_FORMAT':
       return setPendingFormat(store, action.payload);
+    case 'SET_LANGUAGE':
+      return setLanguage(store, action.payload);
     case 'INCREMENT_LINEAR_ACTIVE_SLOT_INDEX':
       return incrementLinearActiveSlotIndex(store);
     case 'DECREMENT_LINEAR_ACTIVE_SLOT_INDEX':

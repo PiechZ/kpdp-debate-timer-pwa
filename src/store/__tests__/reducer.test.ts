@@ -301,6 +301,90 @@ describe('Debatiáda format', () => {
   });
 });
 
+describe('SET_LANGUAGE', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('relabels slots but never touches elapsed/paused/selected/timeStartedDate', () => {
+    const kpdpStore = createInitialStore('kpdp', 'cs');
+    const running = togglePausedTimer(kpdpStore);
+    const activeSlot = getRunningTimeSlot(running)!;
+
+    let ticked = running;
+    for (let i = 0; i < 5; i += 1) {
+      ticked = tick(ticked, activeSlot);
+    }
+
+    const beforeSwitch = allSlots(ticked).find((slot) => slot.id === activeSlot.id)!;
+    expect(beforeSwitch.elapsed).toBe(5);
+
+    const store = reducer(ticked, { type: 'SET_LANGUAGE', payload: 'en' });
+    const afterSwitch = allSlots(store).find((slot) => slot.id === activeSlot.id)!;
+
+    expect(afterSwitch.elapsed).toBe(5);
+    expect(afterSwitch.paused).toBe(beforeSwitch.paused);
+    expect(afterSwitch.selected).toBe(beforeSwitch.selected);
+    expect(afterSwitch.timeStartedDate).toBe(beforeSwitch.timeStartedDate);
+
+    const affirmativePrep = store.prepTimes.find((slot) => slot.id === 'prep-affirmative')!;
+    expect(affirmativePrep.label).toBe('Affirmative');
+  });
+
+  it('Debatiáda: relabels a1-closing but leaves notation labels like a1 unchanged', () => {
+    const debatiadaStore = createInitialStore('debatiada', 'cs');
+    const store = reducer(debatiadaStore, { type: 'SET_LANGUAGE', payload: 'en' });
+
+    const a1Closing = allSlots(store).find((slot) => slot.id === 'a1-closing')!;
+    const a1 = allSlots(store).find((slot) => slot.id === 'a1')!;
+
+    expect(a1Closing.label).toBe('A1 Closing');
+    expect(a1.label).toBe('A1');
+  });
+
+  it('refreshes RadioOption labels while preserving which option is active', () => {
+    const kpdpStore = createInitialStore('kpdp', 'cs');
+    const store = reducer(kpdpStore, { type: 'SET_LANGUAGE', payload: 'en' });
+
+    const enOption = store.languages.find((item) => item.value === 'en')!;
+    const csOption = store.languages.find((item) => item.value === 'cs')!;
+    expect(enOption.active).toBe(true);
+    expect(csOption.active).toBe(false);
+    expect(csOption.label).toBe('Čeština');
+    expect(enOption.label).toBe('English');
+
+    const activeTheme = kpdpStore.themes.find((item) => item.active)!;
+    const newActiveTheme = store.themes.find((item) => item.active)!;
+    expect(newActiveTheme.value).toBe(activeTheme.value);
+
+    const activeMode = kpdpStore.modes.find((item) => item.active)!;
+    const newActiveMode = store.modes.find((item) => item.active)!;
+    expect(newActiveMode.value).toBe(activeMode.value);
+
+    const activeFormat = kpdpStore.formats.find((item) => item.active)!;
+    const newActiveFormat = store.formats.find((item) => item.active)!;
+    expect(newActiveFormat.value).toBe(activeFormat.value);
+    expect(newActiveFormat.label).toBe('KPDP');
+  });
+
+  it('persists the choice to localStorage', () => {
+    const kpdpStore = createInitialStore('kpdp', 'cs');
+    reducer(kpdpStore, { type: 'SET_LANGUAGE', payload: 'en' });
+
+    expect(localStorage.getItem('activeLanguage')).toBe('en');
+  });
+
+  it('does not reset linearActiveSlotIndex', () => {
+    const kpdpStore = createInitialStore('kpdp', 'cs');
+    const advanced = increment(increment(increment(kpdpStore)));
+    expect(advanced.linearActiveSlotIndex).toBe(3);
+
+    const store = reducer(advanced, { type: 'SET_LANGUAGE', payload: 'en' });
+
+    expect(store.linearActiveSlotIndex).toBe(3);
+  });
+});
+
 describe('classic mode shared prep time (prep-shared)', () => {
   beforeEach(() => {
     localStorage.clear();
