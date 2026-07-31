@@ -1,9 +1,11 @@
 import { StoreAction, StoreContent } from './types';
 import { Screen, screens, TimeSlot } from '../types';
-import initialStore from './initialStore';
+import { createInitialStore } from './initialStore';
 import { activateThemeColour } from '../themes';
 import { setActiveOption } from '../localStorage';
 import { getLinearTimeSlots } from '../components/ModeLinear/getters';
+import { getActiveStoreFormat } from './getters';
+import { Format } from '../formats';
 
 const setScreen = (
   store: StoreContent,
@@ -50,6 +52,27 @@ const setMode = (store: StoreContent, value: string): StoreContent => {
     })),
   };
 };
+
+const setFormat = (store: StoreContent, value: string): StoreContent => {
+  setActiveOption('format', value);
+  const fresh = createInitialStore(value as Format);
+  return {
+    ...store,
+    formats: store.formats.map((item) => ({
+      ...item,
+      active: item.value === value,
+    })),
+    speakers: fresh.speakers,
+    prepTimes: fresh.prepTimes,
+    linearActiveSlotIndex: fresh.linearActiveSlotIndex,
+    pendingFormat: null,
+  };
+};
+
+const setPendingFormat = (store: StoreContent, value: string | null): StoreContent => ({
+  ...store,
+  pendingFormat: value,
+});
 
 const toggleActiveTimeSlot = (
   slot: TimeSlot,
@@ -142,11 +165,21 @@ const timeslotTick = (store: StoreContent, slot: TimeSlot): StoreContent => ({
   speakers: store.speakers.map((party) => party.map((item) => tickItem(item, slot))),
 });
 
-const reset = (store: StoreContent): StoreContent => ({
+const reset = (store: StoreContent): StoreContent => {
+  const fresh = createInitialStore(getActiveStoreFormat(store));
+  return {
+    ...store,
+    speakers: fresh.speakers,
+    prepTimes: fresh.prepTimes,
+    linearActiveSlotIndex: fresh.linearActiveSlotIndex,
+  };
+};
+
+const resetPrepTime = (store: StoreContent, id: string): StoreContent => ({
   ...store,
-  speakers: initialStore.speakers,
-  prepTimes: initialStore.prepTimes,
-  linearActiveSlotIndex: initialStore.linearActiveSlotIndex,
+  prepTimes: store.prepTimes.map((slot) => (
+    slot.id === id ? { ...slot, elapsed: 0, timeStartedDate: null } : slot
+  )),
 });
 
 const toggleResetDialog = (store: StoreContent, visible: boolean): StoreContent => ({
@@ -181,6 +214,10 @@ const reducer = (store: StoreContent, action: StoreAction): StoreContent => {
       return setTheme(store, action.payload);
     case 'SET_MODE':
       return setMode(store, action.payload);
+    case 'SET_FORMAT':
+      return setFormat(store, action.payload);
+    case 'SET_PENDING_FORMAT':
+      return setPendingFormat(store, action.payload);
     case 'INCREMENT_LINEAR_ACTIVE_SLOT_INDEX':
       return incrementLinearActiveSlotIndex(store);
     case 'DECREMENT_LINEAR_ACTIVE_SLOT_INDEX':
@@ -193,6 +230,8 @@ const reducer = (store: StoreContent, action: StoreAction): StoreContent => {
       return timeslotTick(store, action.payload);
     case 'RESET':
       return reset(store);
+    case 'RESET_PREP_TIME':
+      return resetPrepTime(store, action.payload);
     case 'TOGGLE_RESET_DIALOG':
       return toggleResetDialog(store, action.payload);
     case 'TOGGLE_PAUSED_TIMER':

@@ -1,5 +1,5 @@
 import reducer from '../reducer';
-import initialStore from '../initialStore';
+import initialStore, { createInitialStore } from '../initialStore';
 import { StoreContent } from '../types';
 import { TimeSlot } from '../../types';
 import { getRunningTimeSlot } from '../getters';
@@ -198,5 +198,101 @@ describe('slot ids', () => {
     const uniqueIds = new Set(ids);
 
     expect(uniqueIds.size).toBe(ids.length);
+  });
+});
+
+describe('Debatiáda format', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('produces the expected 17-card linear carousel order', () => {
+    const store = createInitialStore('debatiada');
+    const ids = getLinearTimeSlots(store).map((slot) => slot.id);
+
+    expect(ids).toEqual([
+      'a1', 'prep-1', 'n-a1', 'prep-2',
+      'n1', 'prep-3', 'a-n1', 'prep-4',
+      'a2', 'prep-5', 'n-a2', 'prep-6',
+      'n2', 'prep-7', 'a-n2', 'prep-8',
+      'a1-closing',
+    ]);
+  });
+
+  it('ticks a1 and a1-closing independently', () => {
+    const store = createInitialStore('debatiada');
+    const a1 = allSlots(store).find((slot) => slot.id === 'a1')!;
+    const a1Closing = allSlots(store).find((slot) => slot.id === 'a1-closing')!;
+
+    expect(a1.total).toBe(180);
+    expect(a1Closing.total).toBe(60);
+
+    let ticked = store;
+    for (let i = 0; i < 10; i += 1) {
+      ticked = tick(ticked, a1);
+    }
+
+    const tickedA1 = allSlots(ticked).find((slot) => slot.id === 'a1')!;
+    const tickedA1Closing = allSlots(ticked).find((slot) => slot.id === 'a1-closing')!;
+
+    expect(tickedA1.elapsed).toBe(10);
+    expect(tickedA1Closing.elapsed).toBe(0);
+  });
+
+  it('ticks prep-1 through prep-8 independently', () => {
+    const store = createInitialStore('debatiada');
+    const prep1 = store.prepTimes.find((slot) => slot.id === 'prep-1')!;
+
+    let ticked = store;
+    for (let i = 0; i < 5; i += 1) {
+      ticked = tick(ticked, prep1);
+    }
+
+    const otherPreps = ticked.prepTimes.filter((slot) => slot.id !== 'prep-1' && slot.id.startsWith('prep-') && slot.id !== 'prep-shared');
+    expect(otherPreps.length).toBe(7);
+    otherPreps.forEach((slot) => {
+      expect(slot.elapsed).toBe(0);
+    });
+  });
+
+  it('SET_FORMAT swaps to the Debatiáda slot shape and persists the choice', () => {
+    const kpdpStore = createInitialStore('kpdp');
+    const store = reducer(kpdpStore, { type: 'SET_FORMAT', payload: 'debatiada' });
+
+    expect(store.linearActiveSlotIndex).toBe(0);
+    expect(store.formats.find((item) => item.value === 'debatiada')!.active).toBe(true);
+    expect(store.formats.find((item) => item.value === 'kpdp')!.active).toBe(false);
+    expect(localStorage.getItem('activeFormat')).toBe('debatiada');
+    expect(store.speakers[0].length).toBe(5);
+  });
+
+  it('RESET after SET_FORMAT rebuilds Debatiáda slots, not KPDP ones', () => {
+    const kpdpStore = createInitialStore('kpdp');
+    const switched = reducer(kpdpStore, { type: 'SET_FORMAT', payload: 'debatiada' });
+    const a1 = allSlots(switched).find((slot) => slot.id === 'a1')!;
+    const ticked = tick(switched, a1);
+
+    const store = reducer(ticked, { type: 'RESET', payload: null });
+
+    expect(store.speakers[0].length).toBe(5);
+    expect(store.speakers[1].length).toBe(4);
+    expect(store.prepTimes.length).toBe(9);
+    allSlots(store).forEach((slot) => {
+      expect(slot.elapsed).toBe(0);
+    });
+  });
+
+  it('walks through all 17 cards and stops advancing at index 16', () => {
+    let store = createInitialStore('debatiada');
+
+    for (let i = 0; i < 16; i += 1) {
+      store = togglePausedTimer(store);
+      store = increment(store);
+    }
+
+    expect(store.linearActiveSlotIndex).toBe(16);
+
+    store = increment(store);
+    expect(store.linearActiveSlotIndex).toBe(16);
   });
 });
