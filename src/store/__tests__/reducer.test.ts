@@ -152,7 +152,7 @@ describe('prep time pooling', () => {
 
 describe('SET_SELECTED_SPEAKER', () => {
   it('selects exactly one slot across both parties', () => {
-    const store = reducer(initialStore, { type: 'SET_SELECTED_SPEAKER', payload: 'N2' });
+    const store = reducer(initialStore, { type: 'SET_SELECTED_SPEAKER', payload: 'n2' });
     const selected = allSlots(store).filter((slot) => slot.selected);
 
     expect(selected.map((slot) => slot.label)).toEqual(['N2']);
@@ -161,7 +161,7 @@ describe('SET_SELECTED_SPEAKER', () => {
 
 describe('TOGGLE_ACTIVE_PREP_TIME', () => {
   it('starts the named prep and deselects the other, then pauses on a second toggle', () => {
-    const started = reducer(initialStore, { type: 'TOGGLE_ACTIVE_PREP_TIME', payload: 'Afirmace' });
+    const started = reducer(initialStore, { type: 'TOGGLE_ACTIVE_PREP_TIME', payload: 'prep-affirmative' });
     const affirmativePrep = started.prepTimes.find((slot) => slot.label === 'Afirmace')!;
     const negativePrep = started.prepTimes.find((slot) => slot.label === 'Negace')!;
 
@@ -169,7 +169,7 @@ describe('TOGGLE_ACTIVE_PREP_TIME', () => {
     expect(affirmativePrep.paused).toBe(false);
     expect(negativePrep.selected).toBe(false);
 
-    const toggledAgain = reducer(started, { type: 'TOGGLE_ACTIVE_PREP_TIME', payload: 'Afirmace' });
+    const toggledAgain = reducer(started, { type: 'TOGGLE_ACTIVE_PREP_TIME', payload: 'prep-affirmative' });
     const affirmativePrepAgain = toggledAgain.prepTimes.find((slot) => slot.label === 'Afirmace')!;
 
     expect(affirmativePrepAgain.paused).toBe(true);
@@ -189,5 +189,14 @@ describe('RESET', () => {
     allSlots(store).forEach((slot) => {
       expect(slot.elapsed).toBe(0);
     });
+  });
+});
+
+describe('slot ids', () => {
+  it('are unique across all speakers and prep times', () => {
+    const ids = allSlots(initialStore).map((slot) => slot.id);
+    const uniqueIds = new Set(ids);
+
+    expect(uniqueIds.size).toBe(ids.length);
   });
 });

@@ -68,7 +68,7 @@ const incrementLinearActiveSlotIndex = (store: StoreContent): StoreContent => {
   const currentSlot: TimeSlot | null = linearSlots[store.linearActiveSlotIndex];
   const nextSlot: TimeSlot | null = linearSlots[store.linearActiveSlotIndex + 1] ?? null;
 
-  const slotShouldBeActive = (slot: TimeSlot) => nextSlot && slot.label === nextSlot.label;
+  const slotShouldBeActive = (slot: TimeSlot) => nextSlot && slot.id === nextSlot.id;
 
   return {
     ...store,
@@ -89,7 +89,7 @@ const decrementLinearActiveSlotIndex = (store: StoreContent): StoreContent => {
   const linearSlots: TimeSlot[] = getLinearTimeSlots(store);
   const prevSlot: TimeSlot = linearSlots[prevIndex];
 
-  const slotShouldBeActive = (slot: TimeSlot) => slot.label === prevSlot.label;
+  const slotShouldBeActive = (slot: TimeSlot) => slot.id === prevSlot.id;
 
   return {
     ...store,
@@ -103,22 +103,22 @@ const decrementLinearActiveSlotIndex = (store: StoreContent): StoreContent => {
   };
 };
 
-const setSelectedSpeaker = (store: StoreContent, label: string): StoreContent => ({
+const setSelectedSpeaker = (store: StoreContent, id: string): StoreContent => ({
   ...store,
   speakers: store.speakers.map((party) => party.map(
     (item) => ({
       ...item,
-      selected: item.label === label,
+      selected: item.id === id,
     }),
   )),
 });
 
-const toggleActivePrepTime = (store: StoreContent, label: string): StoreContent => ({
+const toggleActivePrepTime = (store: StoreContent, id: string): StoreContent => ({
   ...store,
   prepTimes: store.prepTimes.map(
     (time) => toggleActiveTimeSlot(
       time,
-      time.label === label && (!time.selected || time.paused),
+      time.id === id && (!time.selected || time.paused),
       true,
     ),
   ),
@@ -129,7 +129,7 @@ const getNewTimestartedDate = (
 ) => (time.timeStartedDate ? time.timeStartedDate + 1000 : Date.now());
 
 const tickItem = (item: TimeSlot, activeSlot: TimeSlot): TimeSlot => {
-  const isActive = activeSlot.label === item.label;
+  const isActive = activeSlot.id === item.id;
   return {
     ...item,
     elapsed: isActive ? item.elapsed + 1 : item.elapsed,

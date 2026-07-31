@@ -6,10 +6,10 @@ import { getSelectedPrepTime, getSelectedSpeaker } from '../../../store/getters'
 import Button from '../../Button';
 import localisation from '../../../localisation';
 
-const toggleActivePrepTime = (dispatch: Dispatch, label: string) => {
+const toggleActivePrepTime = (dispatch: Dispatch, id: string) => {
   dispatch({
     type: 'TOGGLE_ACTIVE_PREP_TIME',
-    payload: label,
+    payload: id,
   });
 };
 
@@ -32,7 +32,7 @@ const PrepTime: FunctionalComponent = () => {
             disabled={(selectedPrepTime && selectedPrepTime !== time) || !selectedSpeaker?.paused}
             party={time.party}
             display="remaining"
-            onClick={() => toggleActivePrepTime(dispatch, time.label)}
+            onClick={() => toggleActivePrepTime(dispatch, time.id)}
           />
         ))
       }

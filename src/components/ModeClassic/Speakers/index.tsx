@@ -5,10 +5,10 @@ import { Dispatch } from '../../../store/types';
 import { timerOrPrepTimeRunning } from '../../../store/getters';
 import Button from '../../Button';
 
-const setSelectedSpeaker = (dispatch: Dispatch, label: string) => {
+const setSelectedSpeaker = (dispatch: Dispatch, id: string) => {
   dispatch({
     type: 'SET_SELECTED_SPEAKER',
-    payload: label,
+    payload: id,
   });
 };
 
@@ -30,7 +30,7 @@ const Speakers: FunctionalComponent = () => {
                   disabled={timeRunning}
                   party={speaker.party}
                   time={speaker}
-                  onClick={() => setSelectedSpeaker(dispatch, speaker.label)}
+                  onClick={() => setSelectedSpeaker(dispatch, speaker.id)}
                 />
               ))
             }
