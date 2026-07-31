@@ -27,3 +27,11 @@ export interface TimeSlot {
   // set to Date.now() after timer is started to accurately compute elapsed time
   timeStartedDate: number | null
 }
+
+export interface FormatConfig {
+  speakers: TimeSlotConfig[][] // [affirmative, negative]
+  prepTimes: TimeSlotConfig[]
+  prepTimeParties: Party[] // party per entry of prepTimes
+  linearOrder: string[] // slot ids, in debate order
+  overviewGroups: string[][][] // [party][row][slot ids] for the linear overview box
+}

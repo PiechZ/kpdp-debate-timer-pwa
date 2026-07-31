@@ -1,7 +1,8 @@
-type StorageKey = 'theme' | 'mode' | 'featureDiscoveryHidden';
+type StorageKey = 'theme' | 'mode' | 'format' | 'featureDiscoveryHidden';
 
 const localStorageKeys: Record<StorageKey, string> = {
   mode: 'activeMode',
+  format: 'activeFormat',
   theme: 'themeColour',
   featureDiscoveryHidden: 'featureDiscoveryHidden',
 };

@@ -3,6 +3,8 @@ const localisation: Record<string, string> = {
   affirmative: 'Afirmace',
   cancel: 'Zrušit',
   close: 'Zavřít',
+  formatDebatiada: 'Debatiáda',
+  formatKpdp: 'KPDP',
   linearFeatureDiscoveryButton: 'Klepněte na kartičku na začátku a konci každé řeči',
   linearFeatureDiscoverySettings: 'Rozložení můžete změnit v nastavení',
   linearPrepTimeSuffix: ' - přípravný čas',
