@@ -8,6 +8,7 @@ export interface StoreContent {
   themes: RadioOption[]
   modes: RadioOption[]
   formats: RadioOption[]
+  languages: RadioOption[]
   speakers: TimeSlot[][]
   prepTimes: TimeSlot[]
   resetDialogVisible: boolean,
@@ -22,6 +23,7 @@ export type StoreActionType =
   | 'SET_MODE'
   | 'SET_FORMAT'
   | 'SET_PENDING_FORMAT'
+  | 'SET_LANGUAGE'
   | 'INCREMENT_LINEAR_ACTIVE_SLOT_INDEX'
   | 'DECREMENT_LINEAR_ACTIVE_SLOT_INDEX'
   | 'SET_SELECTED_SPEAKER'

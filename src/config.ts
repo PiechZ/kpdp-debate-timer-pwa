@@ -1,49 +1,72 @@
 import { FormatConfig, TimeSlotConfig } from './types';
-import localisation from './localisation';
+import getLocalisation from './localisation';
 import { RadioOption } from './components/Radio';
 import { getActiveThemeColourOption } from './themes';
 import { getActiveMode } from './modes';
 import { getActiveFormat, Format } from './formats';
+import { getActiveLanguage, Language } from './languages';
 import { autoValue } from './localStorage';
 
-const activeThemeColour = getActiveThemeColourOption();
-export const themes: RadioOption[] = [{
-  label: localisation.themeColourAuto,
+export const buildThemeOptions = (
+  t: Record<string, string>,
+  activeValue: string,
+): RadioOption[] => [{
+  label: t.themeColourAuto,
   value: autoValue,
 }, {
-  label: localisation.themeColourDark,
+  label: t.themeColourDark,
   value: 'dark',
 }, {
-  label: localisation.themeColourLight,
+  label: t.themeColourLight,
   value: 'light',
 }].map((item) => ({
   ...item,
-  active: item.value === activeThemeColour,
+  active: item.value === activeValue,
 }));
 
-const activeMode = getActiveMode();
-export const modes: RadioOption[] = [{
-  label: localisation.modeLinear,
+const activeThemeColour = getActiveThemeColourOption();
+export const themes: RadioOption[] = buildThemeOptions(getLocalisation(), activeThemeColour);
+
+export const buildModeOptions = (
+  t: Record<string, string>,
+  activeValue: string,
+): RadioOption[] => [{
+  label: t.modeLinear,
   value: 'linear',
 }, {
-  label: localisation.modeClassic,
+  label: t.modeClassic,
   value: 'classic',
 }].map((item) => ({
   ...item,
-  active: item.value === activeMode,
+  active: item.value === activeValue,
 }));
 
-const activeFormat = getActiveFormat();
-export const formats: RadioOption[] = [{
-  label: localisation.formatKpdp,
+const activeMode = getActiveMode();
+export const modes: RadioOption[] = buildModeOptions(getLocalisation(), activeMode);
+
+export const buildFormatOptions = (
+  t: Record<string, string>,
+  activeValue: string,
+): RadioOption[] => [{
+  label: t.formatKpdp,
   value: 'kpdp',
 }, {
-  label: localisation.formatDebatiada,
+  label: t.formatDebatiada,
   value: 'debatiada',
 }].map((item) => ({
   ...item,
-  active: item.value === activeFormat,
+  active: item.value === activeValue,
 }));
+
+const activeFormat = getActiveFormat();
+export const formats: RadioOption[] = buildFormatOptions(getLocalisation(), activeFormat);
+
+export const buildLanguageOptions = (activeValue: string): RadioOption[] => [
+  { label: getLocalisation('cs').languageCs, value: 'cs' },
+  { label: getLocalisation('cs').languageEn, value: 'en' },
+].map((item) => ({ ...item, active: item.value === activeValue }));
+
+export const languages: RadioOption[] = buildLanguageOptions(getActiveLanguage());
 
 const kpdpSpeechTimes: Record<string, number> = {
   constructive: 6,
@@ -96,21 +119,21 @@ const kpdpSpeakers: TimeSlotConfig[][] = [
   }],
 ];
 
-const kpdpPrepTimes: TimeSlotConfig[] = [
+const buildKpdpPrepTimes = (t: Record<string, string>): TimeSlotConfig[] => [
   {
     id: 'prep-affirmative',
-    label: localisation.affirmative,
+    label: t.affirmative,
     time: 5,
-    labelSuffix: localisation.linearPrepTimeSuffix,
+    labelSuffix: t.linearPrepTimeSuffix,
   }, {
     id: 'prep-negative',
-    label: localisation.negative,
+    label: t.negative,
     time: 5,
-    labelSuffix: localisation.linearPrepTimeSuffix,
+    labelSuffix: t.linearPrepTimeSuffix,
   },
 ];
 
-const debatiadaSpeakers: TimeSlotConfig[][] = [
+const buildDebatiadaSpeakers = (t: Record<string, string>): TimeSlotConfig[][] => [
   [{
     id: 'a1',
     label: 'A1',
@@ -121,7 +144,7 @@ const debatiadaSpeakers: TimeSlotConfig[][] = [
     time: 4,
   }, {
     id: 'a1-closing',
-    label: 'A1 závěr',
+    label: t.debatiadaA1ClosingLabel,
     time: 1,
   }, {
     id: 'a-n1',
@@ -151,57 +174,63 @@ const debatiadaSpeakers: TimeSlotConfig[][] = [
   }],
 ];
 
-const debatiadaPrepTimes: TimeSlotConfig[] = [
-  { id: 'prep-1', label: localisation.preptime, time: 1 },
-  { id: 'prep-2', label: localisation.preptime, time: 1 },
-  { id: 'prep-3', label: localisation.preptime, time: 1 },
-  { id: 'prep-4', label: localisation.preptime, time: 1 },
-  { id: 'prep-5', label: localisation.preptime, time: 1 },
-  { id: 'prep-6', label: localisation.preptime, time: 1 },
-  { id: 'prep-7', label: localisation.preptime, time: 1 },
-  { id: 'prep-8', label: localisation.preptime, time: 1 },
+const buildDebatiadaPrepTimes = (t: Record<string, string>): TimeSlotConfig[] => [
+  { id: 'prep-1', label: t.preptime, time: 1 },
+  { id: 'prep-2', label: t.preptime, time: 1 },
+  { id: 'prep-3', label: t.preptime, time: 1 },
+  { id: 'prep-4', label: t.preptime, time: 1 },
+  { id: 'prep-5', label: t.preptime, time: 1 },
+  { id: 'prep-6', label: t.preptime, time: 1 },
+  { id: 'prep-7', label: t.preptime, time: 1 },
+  { id: 'prep-8', label: t.preptime, time: 1 },
   // classic-mode-only placeholder; not part of linearOrder, semantics decided in a later step
-  { id: 'prep-shared', label: localisation.preptime, time: 1 },
+  { id: 'prep-shared', label: t.preptime, time: 1 },
 ];
 
-export const formatConfigs: Record<Format, FormatConfig> = {
-  kpdp: {
-    speakers: kpdpSpeakers,
-    prepTimes: kpdpPrepTimes,
-    prepTimeParties: ['affirmative', 'negative'],
-    linearOrder: [
-      'a1', 'prep-negative', 'n3-a1', 'prep-negative',
-      'n1', 'prep-affirmative', 'a3-n1', 'prep-affirmative',
-      'a2', 'prep-negative', 'n1-a2', 'prep-negative',
-      'n2', 'prep-affirmative', 'a1-n2', 'prep-affirmative',
-      'a3', 'prep-negative', 'n3',
-    ],
-    overviewGroups: [
-      [['a1', 'n3-a1'], ['a2', 'n1-a2'], ['a3']],
-      [['n1', 'a3-n1'], ['n2', 'a1-n2'], ['n3']],
-    ],
-  },
-  debatiada: {
-    speakers: debatiadaSpeakers,
-    prepTimes: debatiadaPrepTimes,
-    prepTimeParties: [
-      'negative', 'negative', 'affirmative', 'affirmative',
-      'negative', 'negative', 'affirmative', 'affirmative',
-      'affirmative',
-    ],
-    linearOrder: [
-      'a1', 'prep-1', 'n-a1', 'prep-2',
-      'n1', 'prep-3', 'a-n1', 'prep-4',
-      'a2', 'prep-5', 'n-a2', 'prep-6',
-      'n2', 'prep-7', 'a-n2', 'prep-8',
-      'a1-closing',
-    ],
-    overviewGroups: [
-      [['a1', 'n-a1'], ['a2', 'n-a2'], ['a1-closing']],
-      [['n1', 'a-n1'], ['n2', 'a-n2']],
-    ],
-  },
+export const getFormatConfigs = (language: Language): Record<Format, FormatConfig> => {
+  const t = getLocalisation(language);
+
+  return {
+    kpdp: {
+      speakers: kpdpSpeakers,
+      prepTimes: buildKpdpPrepTimes(t),
+      prepTimeParties: ['affirmative', 'negative'],
+      linearOrder: [
+        'a1', 'prep-negative', 'n3-a1', 'prep-negative',
+        'n1', 'prep-affirmative', 'a3-n1', 'prep-affirmative',
+        'a2', 'prep-negative', 'n1-a2', 'prep-negative',
+        'n2', 'prep-affirmative', 'a1-n2', 'prep-affirmative',
+        'a3', 'prep-negative', 'n3',
+      ],
+      overviewGroups: [
+        [['a1', 'n3-a1'], ['a2', 'n1-a2'], ['a3']],
+        [['n1', 'a3-n1'], ['n2', 'a1-n2'], ['n3']],
+      ],
+    },
+    debatiada: {
+      speakers: buildDebatiadaSpeakers(t),
+      prepTimes: buildDebatiadaPrepTimes(t),
+      prepTimeParties: [
+        'negative', 'negative', 'affirmative', 'affirmative',
+        'negative', 'negative', 'affirmative', 'affirmative',
+        'affirmative',
+      ],
+      linearOrder: [
+        'a1', 'prep-1', 'n-a1', 'prep-2',
+        'n1', 'prep-3', 'a-n1', 'prep-4',
+        'a2', 'prep-5', 'n-a2', 'prep-6',
+        'n2', 'prep-7', 'a-n2', 'prep-8',
+        'a1-closing',
+      ],
+      overviewGroups: [
+        [['a1', 'n-a1'], ['a2', 'n-a2'], ['a1-closing']],
+        [['n1', 'a-n1'], ['n2', 'a-n2']],
+      ],
+    },
+  };
 };
+
+export const formatConfigs: Record<Format, FormatConfig> = getFormatConfigs(getActiveLanguage());
 
 // Kept for existing call sites (e.g. store/initialStore.ts) that build KPDP-only state
 // directly. Single source of truth remains formatConfigs.kpdp.

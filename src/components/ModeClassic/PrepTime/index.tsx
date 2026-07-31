@@ -5,7 +5,7 @@ import { Dispatch } from '../../../store/types';
 import { TimeSlot } from '../../../types';
 import { getActiveStoreFormat, getSelectedPrepTime, getSelectedSpeaker } from '../../../store/getters';
 import Button from '../../Button';
-import localisation from '../../../localisation';
+import getLocalisation from '../../../localisation';
 
 const toggleActivePrepTime = (dispatch: Dispatch, id: string) => {
   dispatch({
@@ -41,9 +41,9 @@ const PrepTime: FunctionalComponent = () => {
 
     return (
       <section className="preptime">
-        <h2 className="preptime__heading">{localisation.preptime}</h2>
+        <h2 className="preptime__heading">{getLocalisation().preptime}</h2>
         <Button
-          title={localisation.preptime}
+          title={getLocalisation().preptime}
           className="preptime__button"
           time={prepShared}
           active={prepShared.selected && !prepShared.paused}
@@ -59,7 +59,7 @@ const PrepTime: FunctionalComponent = () => {
 
   return (
     <section className="preptime">
-      <h2 className="preptime__heading">{localisation.preptime}</h2>
+      <h2 className="preptime__heading">{getLocalisation().preptime}</h2>
       {
         store.prepTimes.map((time) => (
           <Button

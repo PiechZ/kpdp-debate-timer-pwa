@@ -1,19 +1,21 @@
 import { StoreContent } from './types';
 import {
-  formatConfigs, formats, modes, themes,
+  getFormatConfigs, formats, languages, modes, themes,
 } from '../config';
 import { Screen } from '../types';
 import { getActiveOption } from '../localStorage';
 import { Format, getActiveFormat } from '../formats';
+import { Language, getActiveLanguage } from '../languages';
 
-export const createInitialStore = (format: Format): StoreContent => {
-  const { speakers, prepTimes, prepTimeParties } = formatConfigs[format];
+export const createInitialStore = (format: Format, language: Language): StoreContent => {
+  const { speakers, prepTimes, prepTimeParties } = getFormatConfigs(language)[format];
 
   return {
     screen: 'timer' as Screen,
     themes,
     modes,
     formats: formats.map((item) => ({ ...item, active: item.value === format })),
+    languages: languages.map((item) => ({ ...item, active: item.value === language })),
     speakers: speakers.map(
       (party, partyIndex) => party.map(
         (speaker, speakerIndex) => ({
@@ -45,4 +47,4 @@ export const createInitialStore = (format: Format): StoreContent => {
   } as StoreContent;
 };
 
-export default createInitialStore(getActiveFormat());
+export default createInitialStore(getActiveFormat(), getActiveLanguage());

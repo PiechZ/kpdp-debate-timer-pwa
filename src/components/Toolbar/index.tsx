@@ -3,7 +3,7 @@ import { useContext } from 'preact/hooks';
 import { Context } from '../../store';
 import ToolbarButton from './ToolbarButton';
 import { timerOrPrepTimeRunning } from '../../store/getters';
-import localisation from '../../localisation';
+import getLocalisation from '../../localisation';
 
 const Toolbar: FunctionalComponent = () => {
   const { store, dispatch } = useContext(Context);
@@ -12,7 +12,7 @@ const Toolbar: FunctionalComponent = () => {
   return (
     <nav className="toolbar">
       <ToolbarButton
-        title={localisation.reset}
+        title={getLocalisation().reset}
         icon="reset"
         disabled={timeRunning}
         onClick={() => {
@@ -23,7 +23,7 @@ const Toolbar: FunctionalComponent = () => {
         }}
       />
       <ToolbarButton
-        title={localisation.settings}
+        title={getLocalisation().settings}
         icon="settings"
         disabled={timeRunning}
         onClick={() => {

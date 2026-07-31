@@ -2,6 +2,7 @@ import { StoreContent } from './types';
 import { TimeSlot } from '../types';
 import { Mode } from '../modes';
 import { Format } from '../formats';
+import { Language } from '../languages';
 
 // Get active mode from store
 export const getActiveStoreMode = (store: StoreContent): Mode => <Mode>(
@@ -11,6 +12,11 @@ export const getActiveStoreMode = (store: StoreContent): Mode => <Mode>(
 // Get active format from store
 export const getActiveStoreFormat = (store: StoreContent): Format => <Format>(
   store.formats.find((item) => item.active)!.value
+);
+
+// Get active language from store
+export const getActiveStoreLanguage = (store: StoreContent): Language => <Language>(
+  store.languages.find((item) => item.active)!.value
 );
 
 // Filter selected time slots

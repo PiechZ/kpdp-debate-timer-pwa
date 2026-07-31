@@ -1,10 +1,11 @@
-type StorageKey = 'theme' | 'mode' | 'format' | 'featureDiscoveryHidden';
+type StorageKey = 'theme' | 'mode' | 'format' | 'featureDiscoveryHidden' | 'language';
 
 const localStorageKeys: Record<StorageKey, string> = {
   mode: 'activeMode',
   format: 'activeFormat',
   theme: 'themeColour',
   featureDiscoveryHidden: 'featureDiscoveryHidden',
+  language: 'activeLanguage',
 };
 
 export const autoValue = 'auto';

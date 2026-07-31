@@ -7,7 +7,7 @@ import Navbar from '../../components/Navbar';
 import Radio from '../../components/Radio';
 import About from '../../components/About';
 import Dialog from '../../components/Dialog';
-import localisation from '../../localisation';
+import getLocalisation from '../../localisation';
 
 const setActiveOption = (newValue: string, dispatch: Dispatch, type: StoreActionType): void => {
   dispatch({
@@ -42,17 +42,22 @@ const Settings: FunctionalComponent = () => {
     <main className="screen screen--settings">
       <Navbar />
       <Radio
-        label={`${localisation.themeColour}:`}
+        label={`${getLocalisation().language}:`}
+        options={store.languages}
+        onChange={(newValue) => setActiveOption(newValue, dispatch, 'SET_LANGUAGE')}
+      />
+      <Radio
+        label={`${getLocalisation().themeColour}:`}
         options={store.themes}
         onChange={(newValue) => setActiveOption(newValue, dispatch, 'SET_THEME')}
       />
       <Radio
-        label={`${localisation.format}:`}
+        label={`${getLocalisation().format}:`}
         options={store.formats}
         onChange={(newValue) => requestFormatChange(newValue, store, dispatch)}
       />
       <Radio
-        label={`${localisation.mode}:`}
+        label={`${getLocalisation().mode}:`}
         options={store.modes}
         onChange={(newValue) => setActiveOption(newValue, dispatch, 'SET_MODE')}
       />
@@ -60,10 +65,10 @@ const Settings: FunctionalComponent = () => {
       {store.pendingFormat !== null && (
         <Dialog
           cancel={{
-            title: localisation.cancel,
+            title: getLocalisation().cancel,
           }}
           confirm={{
-            title: localisation.ok,
+            title: getLocalisation().ok,
             onClick: () => dispatch({
               type: 'SET_FORMAT',
               payload: store.pendingFormat,
@@ -75,7 +80,7 @@ const Settings: FunctionalComponent = () => {
           })}
         >
           <p>
-            {localisation.formatChangeConfirm}
+            {getLocalisation().formatChangeConfirm}
           </p>
         </Dialog>
       )}
