@@ -7,3 +7,4 @@ node_modules
 $HOME
 /.idea
 size-plugin.json
+/coverage
