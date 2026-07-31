@@ -50,3 +50,9 @@ export const getRunningTimeSlot = (
 export const timerOrPrepTimeRunning = (store: StoreContent): boolean => (
   !!getRunningPrepTime(store) || !!getRunningSpeaker(store)
 );
+
+// Whether any slot (speaker or prep time) has accumulated elapsed time
+export const hasElapsedTime = (store: StoreContent): boolean => (
+  store.speakers.flat().some((slot) => slot.elapsed > 0)
+  || store.prepTimes.some((slot) => slot.elapsed > 0)
+);
