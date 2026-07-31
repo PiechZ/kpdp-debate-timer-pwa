@@ -296,3 +296,73 @@ describe('Debatiáda format', () => {
     expect(store.linearActiveSlotIndex).toBe(16);
   });
 });
+
+describe('classic mode shared prep time (prep-shared)', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  const prepShared = (store: StoreContent): TimeSlot => (
+    store.prepTimes.find((slot) => slot.id === 'prep-shared')!
+  );
+
+  it('walks through first press, running, paused, and post-expiry press', () => {
+    let store = createInitialStore('debatiada');
+
+    // first press: RESET_PREP_TIME then TOGGLE_ACTIVE_PREP_TIME -> fresh 1:00, running
+    store = reducer(store, { type: 'RESET_PREP_TIME', payload: 'prep-shared' });
+    store = reducer(store, { type: 'TOGGLE_ACTIVE_PREP_TIME', payload: 'prep-shared' });
+
+    expect(prepShared(store).selected).toBe(true);
+    expect(prepShared(store).paused).toBe(false);
+    expect(prepShared(store).elapsed).toBe(0);
+    expect(typeof prepShared(store).timeStartedDate).toBe('number');
+
+    for (let i = 0; i < 3; i += 1) {
+      store = tick(store, prepShared(store));
+    }
+    expect(prepShared(store).elapsed).toBe(3);
+
+    // press while running: TOGGLE_ACTIVE_PREP_TIME only, no reset.
+    // Note: toggleActivePrepTime's `toggleSelected` argument is unconditionally `true`, so
+    // pausing also flips `selected` to false here (it isn't just a `paused` flip) -- this is
+    // existing, pre-Debatiáda reducer behaviour (see the KPDP "TOGGLE_ACTIVE_PREP_TIME" test
+    // above, which only asserts `paused` for the same reason).
+    store = reducer(store, { type: 'TOGGLE_ACTIVE_PREP_TIME', payload: 'prep-shared' });
+
+    expect(prepShared(store).selected).toBe(false);
+    expect(prepShared(store).paused).toBe(true);
+    expect(prepShared(store).elapsed).toBe(3);
+    expect(prepShared(store).timeStartedDate).toBeNull();
+
+    // press while paused: TOGGLE_ACTIVE_PREP_TIME only, resumes without reset
+    store = reducer(store, { type: 'TOGGLE_ACTIVE_PREP_TIME', payload: 'prep-shared' });
+
+    expect(prepShared(store).selected).toBe(true);
+    expect(prepShared(store).paused).toBe(false);
+    expect(prepShared(store).elapsed).toBe(3);
+    expect(typeof prepShared(store).timeStartedDate).toBe('number');
+
+    // pause it again before it expires, then let it run down to (and past) its total while paused
+    store = reducer(store, { type: 'TOGGLE_ACTIVE_PREP_TIME', payload: 'prep-shared' });
+    expect(prepShared(store).paused).toBe(true);
+    expect(prepShared(store).total).toBe(60);
+
+    // press after it hit 0 (paused, elapsed >= total): RESET_PREP_TIME then TOGGLE_ACTIVE_PREP_TIME
+    // -> fresh 1:00, running (not just a resume of the stale/expired value)
+    store = {
+      ...store,
+      prepTimes: store.prepTimes.map((slot) => (
+        slot.id === 'prep-shared' ? { ...slot, elapsed: slot.total } : slot
+      )),
+    };
+    expect(prepShared(store).elapsed >= prepShared(store).total).toBe(true);
+    store = reducer(store, { type: 'RESET_PREP_TIME', payload: 'prep-shared' });
+    store = reducer(store, { type: 'TOGGLE_ACTIVE_PREP_TIME', payload: 'prep-shared' });
+
+    expect(prepShared(store).selected).toBe(true);
+    expect(prepShared(store).paused).toBe(false);
+    expect(prepShared(store).elapsed).toBe(0);
+    expect(typeof prepShared(store).timeStartedDate).toBe('number');
+  });
+});
