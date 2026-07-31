@@ -24,7 +24,7 @@ $carouselCardCount: 18
         .time-slots-carousel__card:first-child
             margin-left: calc(-#{$i} * var(--carousel-card-full-width))
 
-.time-slots-carousel--card-#{$carouselCardCount}-visible
+.time-slots-carousel--last-card-visible
     .time-slots-carousel__card:first-child
         margin-right: calc(var(--carousel-flex-gap) + var(--carousel-card-overflow))
 
@@ -105,7 +105,7 @@ $carouselCardCount: 18
         --carousel-full-width: 100%
         --carousel-card-overflow: .5rem
 
-    .time-slots-carousel--card-#{$carouselCardCount}-visible
+    .time-slots-carousel--last-card-visible
         .time-slots-carousel__card:first-child
             margin-right: calc(var(--carousel-flex-gap) + 4 * var(--carousel-card-overflow))
 

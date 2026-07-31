@@ -29,7 +29,7 @@ const TimeSlotsCarousel: FunctionalComponent = () => {
 
   return (
     <section
-      className={`time-slots-carousel time-slots-carousel--card-${activeSlotIndex}-visible`}
+      className={`time-slots-carousel time-slots-carousel--card-${activeSlotIndex}-visible${activeSlotIndex === timeSlots.length - 1 ? ' time-slots-carousel--last-card-visible' : ''}`}
       onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
       onTouchEnd={(e) => {
         if (touchStartX.current === null) return;

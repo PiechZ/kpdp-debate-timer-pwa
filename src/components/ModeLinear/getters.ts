@@ -33,3 +33,28 @@ export const getLinearTimeSlots = (store: StoreContent): TimeSlot[] => {
 export const getLinearActiveSlotIndex = (
   store: StoreContent,
 ): number => store.linearActiveSlotIndex;
+
+// Get the prep slot for the "current gap" in the linear prep bar:
+// - if the active slot is itself a prep slot, that one
+// - otherwise the next prep slot ahead in linearOrder
+// - otherwise (on/after the final speaker card) the last prep slot in linearOrder
+export const getCurrentGapPrepTime = (store: StoreContent): TimeSlot => {
+  const format = getActiveStoreFormat(store);
+  const { linearOrder } = formatConfigs[format];
+  const activeIndex = store.linearActiveSlotIndex;
+
+  const activeSlot = findSlot(store, linearOrder[activeIndex]);
+  if (activeSlot.type === 'prepTime') {
+    return activeSlot;
+  }
+
+  const nextPrepId = linearOrder
+    .slice(activeIndex + 1)
+    .find((id) => findSlot(store, id).type === 'prepTime');
+
+  const lastPrepId = [...linearOrder]
+    .reverse()
+    .find((id) => findSlot(store, id).type === 'prepTime')!;
+
+  return findSlot(store, nextPrepId ?? lastPrepId);
+};

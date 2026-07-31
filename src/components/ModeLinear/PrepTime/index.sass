@@ -29,6 +29,14 @@
     border-top-left-radius: 0
     --border-colour: var(--party-negative)
 
+.preptime__button--single
+    margin-left: 0
+    margin-right: 0
+    padding-left: 0
+    padding-right: 0
+    width: 100%
+    border-radius: .5rem
+
 .preptime__toggle-paused-button
     position: absolute
     top: 0
@@ -60,6 +68,9 @@
         width: 50%
         font-size: 1.5rem
 
+    .preptime__button--single
+        width: 100%
+
     .preptime__toggle-paused-button
         left: 50%
         transform: translateX(-50%)
@@ -74,6 +85,9 @@
     .preptime__button--linear
         margin: 0
         width: calc(50% - var(--screen-linear-timer-padding))
+
+    .preptime__button--single
+        width: 100%
 
     .preptime__toggle-paused-button
         bottom: 0
