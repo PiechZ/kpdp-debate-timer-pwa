@@ -42,6 +42,11 @@ const Settings: FunctionalComponent = () => {
     <main className="screen screen--settings">
       <Navbar />
       <Radio
+        label={`${getLocalisation().language}:`}
+        options={store.languages}
+        onChange={(newValue) => setActiveOption(newValue, dispatch, 'SET_LANGUAGE')}
+      />
+      <Radio
         label={`${getLocalisation().themeColour}:`}
         options={store.themes}
         onChange={(newValue) => setActiveOption(newValue, dispatch, 'SET_THEME')}
