@@ -8,7 +8,7 @@ import { getActiveStoreMode, getRunningTimeSlot } from '../../store/getters';
 import { Context } from '../../store';
 import { TimeSlot } from '../../types';
 import { Dispatch } from '../../store/types';
-import localisation from '../../localisation';
+import getLocalisation from '../../localisation';
 import { Mode } from '../../modes';
 import TimerLinear from '../TimerLinear';
 
@@ -54,10 +54,10 @@ const Timer: FunctionalComponent = () => {
       {store.resetDialogVisible && (
         <Dialog
           cancel={{
-            title: localisation.cancel,
+            title: getLocalisation().cancel,
           }}
           confirm={{
-            title: localisation.ok,
+            title: getLocalisation().ok,
             onClick: () => dispatch({
               type: 'RESET',
               payload: null,
@@ -69,7 +69,7 @@ const Timer: FunctionalComponent = () => {
           })}
         >
           <p>
-            {localisation.resetConfirm}
+            {getLocalisation().resetConfirm}
           </p>
         </Dialog>
       )}

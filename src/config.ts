@@ -1,10 +1,12 @@
 import { FormatConfig, TimeSlotConfig } from './types';
-import localisation from './localisation';
+import getLocalisation from './localisation';
 import { RadioOption } from './components/Radio';
 import { getActiveThemeColourOption } from './themes';
 import { getActiveMode } from './modes';
 import { getActiveFormat, Format } from './formats';
 import { autoValue } from './localStorage';
+
+const localisation = getLocalisation('cs');
 
 const activeThemeColour = getActiveThemeColourOption();
 export const themes: RadioOption[] = [{

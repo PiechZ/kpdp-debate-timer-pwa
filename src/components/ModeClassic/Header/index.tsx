@@ -5,7 +5,7 @@ import { Context } from '../../../store';
 import Button from '../../Button';
 import Time from '../../Time';
 import { getSelectedPrepTime, getSelectedSpeaker } from '../../../store/getters';
-import localisation from '../../../localisation';
+import getLocalisation from '../../../localisation';
 
 const togglePausedTimer = (dispatch: Dispatch) => {
   dispatch({
@@ -28,7 +28,7 @@ const Header: FunctionalComponent = () => {
       />
       <div className="header__button-wrapper">
         <Button
-          title={activeSpeaker?.paused ? localisation.start : localisation.pause}
+          title={activeSpeaker?.paused ? getLocalisation().start : getLocalisation().pause}
           className="header__button"
           active={!activeSpeaker?.paused}
           disabled={!!activePrepTime}

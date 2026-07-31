@@ -1,6 +1,6 @@
 import { FunctionalComponent, h } from 'preact';
 import { useState } from 'preact/hooks';
-import localisation from '../../localisation';
+import getLocalisation from '../../localisation';
 import Dialog from '../Dialog';
 import SafariOpenMenu from '../Icons/SafariOpenMenu';
 import SafariAddToHomescreen from '../Icons/SafariAddToHomescreen';
@@ -39,7 +39,7 @@ const PWAPromptIOS: FunctionalComponent = () => {
   return (
     <Dialog
       cancel={{
-        title: localisation.close,
+        title: getLocalisation().close,
       }}
       setVisible={() => {
         setPromptVisible(false);
@@ -48,21 +48,21 @@ const PWAPromptIOS: FunctionalComponent = () => {
         }
       }}
     >
-      <h3>{localisation.pwaPromptIOSTitle}</h3>
+      <h3>{getLocalisation().pwaPromptIOSTitle}</h3>
       <p className="pwa-prompt__paragraph">
-        {localisation.pwaPromptIOSParagraph}
+        {getLocalisation().pwaPromptIOSParagraph}
       </p>
       <ol className="pwa-prompt__list">
         <li className="pwa-prompt__list-item">
-          {localisation.pwaPromptIOSOpenMenu}
+          {getLocalisation().pwaPromptIOSOpenMenu}
           <span className="pwa-prompt__icon"><SafariOpenMenu /></span>
         </li>
         <li className="pwa-prompt__list-item">
-          {localisation.pwaPromptIOSAddToHomescreen}
+          {getLocalisation().pwaPromptIOSAddToHomescreen}
           <span className="pwa-prompt__icon"><SafariAddToHomescreen /></span>
         </li>
         <li className="pwa-prompt__list-item">
-          {localisation.pwaPromptIOSDone}
+          {getLocalisation().pwaPromptIOSDone}
         </li>
       </ol>
     </Dialog>
