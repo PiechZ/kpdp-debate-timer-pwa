@@ -2,8 +2,9 @@
 
 Preact + TypeScript PWA debate timer. Two **display modes** — linear (carousel-based, one slot
 at a time) and classic (all slots visible, manual selection) — crossed with two **debate
-formats** — KPDP and Debatiáda — selectable independently in Settings. Format switching resets
-the debate.
+formats** — KPDP and Debatiáda — crossed with two **UI languages** — Czech and English — all
+selectable independently in Settings. Format switching resets the debate; language switching
+does not.
 
 ## Dev
 
@@ -23,14 +24,33 @@ rendering.
 
 ## Key structure
 
-- `src/config.ts` — `formatConfigs: Record<Format, FormatConfig>`, one entry per debate format:
-  speaker/prep-time data, prep-time party ownership, the linear carousel order, and the linear
-  overview box grouping. `formats` exports the KPDP/Debatiáda `RadioOption[]` for Settings.
+- `src/config.ts` — `getFormatConfigs(language): Record<Format, FormatConfig>`, one entry per
+  debate format: speaker/prep-time data (label text resolved for the given language),
+  prep-time party ownership, the linear carousel order, and the linear overview box grouping.
+  `linearOrder`/`overviewGroups`/`prepTimeParties` never depend on language — only the label
+  text inside `speakers`/`prepTimes` does. A module-level `formatConfigs` snapshot (built at
+  import time from whatever language was active then) is kept only for
+  `ModeLinear/getters.ts`, which never reads label text from it — just ordering/grouping ids —
+  so it staying stale across a language switch is harmless. `buildThemeOptions`/
+  `buildModeOptions`/`buildFormatOptions`/`buildLanguageOptions` build each Settings radio's
+  `RadioOption[]` from a resolved translation dict plus the currently-active value.
 - `src/formats.ts` — `Format = 'kpdp' | 'debatiada'`, `getActiveFormat()` (localStorage-backed),
   mirrors `src/modes.ts`.
+- `src/languages.ts` — `Language = 'cs' | 'en'`, `getActiveLanguage()`: an explicit
+  localStorage choice always wins; absent that, defaults to browser locale detection
+  (`navigator.language` starting with `cs` → Czech, else English), guarded for the SSR
+  prerender step where `window`/`navigator` don't exist (mirrors `getActiveThemeColour`'s
+  `prefers-color-scheme` guard in `src/themes.ts`).
+- `src/localisation.ts` — `getLocalisation(language?)` returns that language's translation
+  dict, defaulting to `getActiveLanguage()`. Every UI-chrome component reads it live on each
+  render (nothing in the tree is memoised, so any dispatch re-renders everything), so most
+  consumers just needed `localisation.xxx` → `getLocalisation().xxx`. `config.ts`'s consumers
+  need an explicit language argument instead, since they build data that gets snapshotted into
+  the store rather than read live.
 - `src/store/` — Redux-style store: `types.ts` (action types), `reducer.ts` (all state
-  transitions), `initialStore.ts` (`createInitialStore(format)` factory — not a frozen
-  constant, since slot data depends on the active format).
+  transitions), `initialStore.ts` (`createInitialStore(format, language)` factory — both
+  parameters required, never defaulted, so nothing can silently depend on an implicit,
+  environment-dependent default — not a frozen constant, since slot data depends on both).
 - `src/components/ModeLinear/` — linear mode UI; `TimeSlotsCarousel/` is the swipeable card
   carousel; `getters.ts` resolves a format's `linearOrder`/`overviewGroups` against the store.
 - `src/components/ModeClassic/` — classic mode UI.
@@ -47,6 +67,18 @@ opposite case — the *same* `prep-affirmative`/`prep-negative` id appears at mu
 positions and deliberately shares one pooled countdown, because carousel resolution
 (`getLinearTimeSlots`) looks the id up in the store rather than storing separate copies per
 position.
+
+## Language switching relabels in place, never resets
+
+`SET_LANGUAGE` (see `reducer.ts`'s `setLanguage`/`relabelSlots`) walks the store's existing
+speakers/prep times by `id` and overwrites only `label`/`labelSuffix` from freshly-resolved
+`getFormatConfigs(language)` data — `elapsed`/`paused`/`selected`/`timeStartedDate` and
+`linearActiveSlotIndex` are untouched, so switching language mid-debate never loses progress.
+Contrast with `SET_FORMAT`, which rebuilds the whole slot set via `createInitialStore` and does
+reset the debate (the two are fundamentally different: format changes the slot *set*, language
+only changes slot *label text*). Debate notation (`A1`, `N1`, `➝`) is identical across
+languages — only prose labels (`Afirmace`/`Negace`/`Přípravný čas`, Debatiáda's `A1 závěr`) are
+actually translated.
 
 ## Linear mode flow
 
