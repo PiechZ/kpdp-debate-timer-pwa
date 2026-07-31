@@ -1,9 +1,13 @@
 import reducer from '../reducer';
-import initialStore, { createInitialStore } from '../initialStore';
+import { createInitialStore } from '../initialStore';
 import { StoreContent } from '../types';
 import { TimeSlot } from '../../types';
 import { getRunningTimeSlot } from '../getters';
 import { getLinearTimeSlots } from '../../components/ModeLinear/getters';
+
+// Pinned to 'cs' explicitly: this test file asserts Czech label text, and must not depend on
+// jsdom's environment-detected default language (see languages.ts / getActiveLanguage).
+const initialStore = createInitialStore('kpdp', 'cs');
 
 const increment = (store: StoreContent): StoreContent => reducer(store, {
   type: 'INCREMENT_LINEAR_ACTIVE_SLOT_INDEX',
@@ -207,7 +211,7 @@ describe('Debatiáda format', () => {
   });
 
   it('produces the expected 17-card linear carousel order', () => {
-    const store = createInitialStore('debatiada');
+    const store = createInitialStore('debatiada', 'cs');
     const ids = getLinearTimeSlots(store).map((slot) => slot.id);
 
     expect(ids).toEqual([
@@ -220,7 +224,7 @@ describe('Debatiáda format', () => {
   });
 
   it('ticks a1 and a1-closing independently', () => {
-    const store = createInitialStore('debatiada');
+    const store = createInitialStore('debatiada', 'cs');
     const a1 = allSlots(store).find((slot) => slot.id === 'a1')!;
     const a1Closing = allSlots(store).find((slot) => slot.id === 'a1-closing')!;
 
@@ -240,7 +244,7 @@ describe('Debatiáda format', () => {
   });
 
   it('ticks prep-1 through prep-8 independently', () => {
-    const store = createInitialStore('debatiada');
+    const store = createInitialStore('debatiada', 'cs');
     const prep1 = store.prepTimes.find((slot) => slot.id === 'prep-1')!;
 
     let ticked = store;
@@ -256,7 +260,7 @@ describe('Debatiáda format', () => {
   });
 
   it('SET_FORMAT swaps to the Debatiáda slot shape and persists the choice', () => {
-    const kpdpStore = createInitialStore('kpdp');
+    const kpdpStore = createInitialStore('kpdp', 'cs');
     const store = reducer(kpdpStore, { type: 'SET_FORMAT', payload: 'debatiada' });
 
     expect(store.linearActiveSlotIndex).toBe(0);
@@ -267,7 +271,7 @@ describe('Debatiáda format', () => {
   });
 
   it('RESET after SET_FORMAT rebuilds Debatiáda slots, not KPDP ones', () => {
-    const kpdpStore = createInitialStore('kpdp');
+    const kpdpStore = createInitialStore('kpdp', 'cs');
     const switched = reducer(kpdpStore, { type: 'SET_FORMAT', payload: 'debatiada' });
     const a1 = allSlots(switched).find((slot) => slot.id === 'a1')!;
     const ticked = tick(switched, a1);
@@ -283,7 +287,7 @@ describe('Debatiáda format', () => {
   });
 
   it('walks through all 17 cards and stops advancing at index 16', () => {
-    let store = createInitialStore('debatiada');
+    let store = createInitialStore('debatiada', 'cs');
 
     for (let i = 0; i < 16; i += 1) {
       store = togglePausedTimer(store);
@@ -307,7 +311,7 @@ describe('classic mode shared prep time (prep-shared)', () => {
   );
 
   it('walks through first press, running, paused, and post-expiry press', () => {
-    let store = createInitialStore('debatiada');
+    let store = createInitialStore('debatiada', 'cs');
 
     // first press: RESET_PREP_TIME then TOGGLE_ACTIVE_PREP_TIME -> fresh 1:00, running
     store = reducer(store, { type: 'RESET_PREP_TIME', payload: 'prep-shared' });

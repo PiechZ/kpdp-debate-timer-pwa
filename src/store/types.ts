@@ -8,6 +8,7 @@ export interface StoreContent {
   themes: RadioOption[]
   modes: RadioOption[]
   formats: RadioOption[]
+  languages: RadioOption[]
   speakers: TimeSlot[][]
   prepTimes: TimeSlot[]
   resetDialogVisible: boolean,

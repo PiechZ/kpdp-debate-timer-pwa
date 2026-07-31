@@ -1,4 +1,4 @@
-import { formatConfigs } from '../config';
+import { formatConfigs, getFormatConfigs, buildLanguageOptions } from '../config';
 import { Format } from '../formats';
 
 const formats: Format[] = ['kpdp', 'debatiada'];
@@ -87,5 +87,43 @@ describe('Debatiáda timing totals', () => {
       .reduce((sum, slot) => sum + slot.time, 0);
 
     expect(totalMinutes).toBe(8);
+  });
+});
+
+describe('getFormatConfigs language-awareness', () => {
+  it('translates the Debatiáda A1-closing speech label', () => {
+    const csLabel = getFormatConfigs('cs').debatiada.speakers[0]
+      .find((s) => s.id === 'a1-closing')!.label;
+    const enLabel = getFormatConfigs('en').debatiada.speakers[0]
+      .find((s) => s.id === 'a1-closing')!.label;
+
+    expect(csLabel).toBe('A1 závěr');
+    expect(enLabel).toBe('A1 Closing');
+  });
+
+  it('translates the KPDP prep time labels', () => {
+    expect(getFormatConfigs('cs').kpdp.prepTimes[0].label).toBe('Afirmace');
+    expect(getFormatConfigs('en').kpdp.prepTimes[0].label).toBe('Affirmative');
+  });
+
+  it('keeps notation labels identical across languages', () => {
+    expect(getFormatConfigs('cs').kpdp.speakers[0][0].label).toBe('A1');
+    expect(getFormatConfigs('en').kpdp.speakers[0][0].label).toBe('A1');
+  });
+});
+
+describe('buildLanguageOptions', () => {
+  it('returns both language options with fixed native names and correct active flag', () => {
+    const options = buildLanguageOptions('en');
+
+    expect(options).toHaveLength(2);
+
+    const en = options.find((o) => o.value === 'en')!;
+    const cs = options.find((o) => o.value === 'cs')!;
+
+    expect(en.active).toBe(true);
+    expect(cs.active).toBe(false);
+    expect(en.label).toBe('English');
+    expect(cs.label).toBe('Čeština');
   });
 });

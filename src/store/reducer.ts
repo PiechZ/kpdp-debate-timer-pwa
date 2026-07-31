@@ -4,7 +4,7 @@ import { createInitialStore } from './initialStore';
 import { activateThemeColour } from '../themes';
 import { setActiveOption } from '../localStorage';
 import { getLinearTimeSlots } from '../components/ModeLinear/getters';
-import { getActiveStoreFormat } from './getters';
+import { getActiveStoreFormat, getActiveStoreLanguage } from './getters';
 import { Format } from '../formats';
 
 const setScreen = (
@@ -55,7 +55,7 @@ const setMode = (store: StoreContent, value: string): StoreContent => {
 
 const setFormat = (store: StoreContent, value: string): StoreContent => {
   setActiveOption('format', value);
-  const fresh = createInitialStore(value as Format);
+  const fresh = createInitialStore(value as Format, getActiveStoreLanguage(store));
   return {
     ...store,
     formats: store.formats.map((item) => ({
@@ -166,7 +166,7 @@ const timeslotTick = (store: StoreContent, slot: TimeSlot): StoreContent => ({
 });
 
 const reset = (store: StoreContent): StoreContent => {
-  const fresh = createInitialStore(getActiveStoreFormat(store));
+  const fresh = createInitialStore(getActiveStoreFormat(store), getActiveStoreLanguage(store));
   return {
     ...store,
     speakers: fresh.speakers,

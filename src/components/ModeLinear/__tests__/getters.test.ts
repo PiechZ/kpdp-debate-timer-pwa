@@ -1,8 +1,12 @@
 import { getCurrentGapPrepTime, getLinearSpeakersData, getLinearTimeSlots } from '../getters';
-import initialStore, { createInitialStore } from '../../../store/initialStore';
+import { createInitialStore } from '../../../store/initialStore';
 import { TimeSlot } from '../../../types';
 
 const labelsOf = (slots: TimeSlot[]) => slots.map((slot) => slot.label);
+
+// Pinned to 'cs' explicitly: this test file asserts Czech label text, and must not depend on
+// jsdom's environment-detected default language (see languages.ts / getActiveLanguage).
+const initialStore = createInitialStore('kpdp', 'cs');
 
 describe('getLinearTimeSlots', () => {
   const slots = getLinearTimeSlots(initialStore);
@@ -55,7 +59,7 @@ describe('getLinearSpeakersData', () => {
 describe('getCurrentGapPrepTime', () => {
   it('KPDP: returns the active slot itself when it is a prep slot', () => {
     const store = {
-      ...createInitialStore('kpdp'),
+      ...createInitialStore('kpdp', 'cs'),
       linearActiveSlotIndex: 1, // prep-negative, after a1
     };
 
@@ -64,7 +68,7 @@ describe('getCurrentGapPrepTime', () => {
 
   it('KPDP: returns the next prep slot when the active slot is a speaker', () => {
     const store = {
-      ...createInitialStore('kpdp'),
+      ...createInitialStore('kpdp', 'cs'),
       linearActiveSlotIndex: 4, // n1, next prep is prep-affirmative at index 5
     };
 
@@ -73,7 +77,7 @@ describe('getCurrentGapPrepTime', () => {
 
   it('KPDP: returns the last prep slot once on the final card', () => {
     const store = {
-      ...createInitialStore('kpdp'),
+      ...createInitialStore('kpdp', 'cs'),
       linearActiveSlotIndex: 18, // n3, the last card, no prep ahead
     };
 
@@ -82,7 +86,7 @@ describe('getCurrentGapPrepTime', () => {
 
   it('Debatiáda: returns the active slot itself when it is a prep slot', () => {
     const store = {
-      ...createInitialStore('debatiada'),
+      ...createInitialStore('debatiada', 'cs'),
       linearActiveSlotIndex: 1, // prep-1, after a1
     };
 
@@ -91,7 +95,7 @@ describe('getCurrentGapPrepTime', () => {
 
   it('Debatiáda: returns the next prep slot when the active slot is a speaker', () => {
     const store = {
-      ...createInitialStore('debatiada'),
+      ...createInitialStore('debatiada', 'cs'),
       linearActiveSlotIndex: 4, // n1, next prep is prep-3 at index 5
     };
 
@@ -100,7 +104,7 @@ describe('getCurrentGapPrepTime', () => {
 
   it('Debatiáda: returns the last prep slot (prep-8) once on the final a1-closing card', () => {
     const store = {
-      ...createInitialStore('debatiada'),
+      ...createInitialStore('debatiada', 'cs'),
       linearActiveSlotIndex: 16, // a1-closing, the last card, no prep ahead
     };
 
