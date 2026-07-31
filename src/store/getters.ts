@@ -1,11 +1,19 @@
 import { StoreContent } from './types';
 import { TimeSlot } from '../types';
 import { Mode } from '../modes';
+import { Format, getActiveFormat } from '../formats';
 
 // Get active mode from store
 export const getActiveStoreMode = (store: StoreContent): Mode => <Mode>(
   store.modes.find((item) => item.active)!.value
 );
+
+// Get active format from store. `StoreContent` does not yet carry a `formats` field
+// (that's added in a later step of the Debatiáda migration) mirroring `store.modes`, so for
+// now fall back to reading it via getActiveFormat() from src/formats.ts (localStorage-backed).
+// Once `store.formats` exists this should be rewritten to mirror getActiveStoreMode above,
+// deriving the format from the store's own state instead.
+export const getActiveStoreFormat = (store: StoreContent): Format => getActiveFormat();
 
 // Filter selected time slots
 const filterSelectedTimeSlot = (slots: TimeSlot[]): TimeSlot | undefined => (
