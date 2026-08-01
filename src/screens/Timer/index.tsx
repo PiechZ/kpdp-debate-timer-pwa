@@ -40,6 +40,7 @@ const Timer: FunctionalComponent = () => {
   const { store, dispatch } = useContext(Context);
   const activeTimeSlot: TimeSlot | undefined = getRunningTimeSlot(store);
   const activeMode: Mode = getActiveStoreMode(store);
+  const t = getLocalisation();
 
   useEffect(() => tickTimer(activeTimeSlot, dispatch), [activeTimeSlot]);
 
@@ -54,10 +55,10 @@ const Timer: FunctionalComponent = () => {
       {store.resetDialogVisible && (
         <Dialog
           cancel={{
-            title: getLocalisation().cancel,
+            title: t.cancel,
           }}
           confirm={{
-            title: getLocalisation().ok,
+            title: t.ok,
             onClick: () => dispatch({
               type: 'RESET',
               payload: null,
@@ -69,7 +70,7 @@ const Timer: FunctionalComponent = () => {
           })}
         >
           <p>
-            {getLocalisation().resetConfirm}
+            {t.resetConfirm}
           </p>
         </Dialog>
       )}

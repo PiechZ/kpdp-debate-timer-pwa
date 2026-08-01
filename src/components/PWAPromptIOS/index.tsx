@@ -36,10 +36,12 @@ const PWAPromptIOS: FunctionalComponent = () => {
     return null;
   }
 
+  const t = getLocalisation();
+
   return (
     <Dialog
       cancel={{
-        title: getLocalisation().close,
+        title: t.close,
       }}
       setVisible={() => {
         setPromptVisible(false);
@@ -48,21 +50,21 @@ const PWAPromptIOS: FunctionalComponent = () => {
         }
       }}
     >
-      <h3>{getLocalisation().pwaPromptIOSTitle}</h3>
+      <h3>{t.pwaPromptIOSTitle}</h3>
       <p className="pwa-prompt__paragraph">
-        {getLocalisation().pwaPromptIOSParagraph}
+        {t.pwaPromptIOSParagraph}
       </p>
       <ol className="pwa-prompt__list">
         <li className="pwa-prompt__list-item">
-          {getLocalisation().pwaPromptIOSOpenMenu}
+          {t.pwaPromptIOSOpenMenu}
           <span className="pwa-prompt__icon"><SafariOpenMenu /></span>
         </li>
         <li className="pwa-prompt__list-item">
-          {getLocalisation().pwaPromptIOSAddToHomescreen}
+          {t.pwaPromptIOSAddToHomescreen}
           <span className="pwa-prompt__icon"><SafariAddToHomescreen /></span>
         </li>
         <li className="pwa-prompt__list-item">
-          {getLocalisation().pwaPromptIOSDone}
+          {t.pwaPromptIOSDone}
         </li>
       </ol>
     </Dialog>

@@ -18,6 +18,7 @@ const Header: FunctionalComponent = () => {
   const { store, dispatch } = useContext(Context);
   const activeSpeaker = getSelectedSpeaker(store);
   const activePrepTime = getSelectedPrepTime(store);
+  const t = getLocalisation();
 
   return (
     <header className="header">
@@ -28,7 +29,7 @@ const Header: FunctionalComponent = () => {
       />
       <div className="header__button-wrapper">
         <Button
-          title={activeSpeaker?.paused ? getLocalisation().start : getLocalisation().pause}
+          title={activeSpeaker?.paused ? t.start : t.pause}
           className="header__button"
           active={!activeSpeaker?.paused}
           disabled={!!activePrepTime}

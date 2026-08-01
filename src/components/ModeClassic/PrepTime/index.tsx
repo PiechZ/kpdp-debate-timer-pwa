@@ -35,15 +35,16 @@ const PrepTime: FunctionalComponent = () => {
   const { store, dispatch } = useContext(Context);
   const selectedSpeaker = getSelectedSpeaker(store);
   const selectedPrepTime = getSelectedPrepTime(store);
+  const t = getLocalisation();
 
   if (getActiveStoreFormat(store) === 'debatiada') {
     const prepShared = store.prepTimes.find((time) => time.id === 'prep-shared')!;
 
     return (
       <section className="preptime">
-        <h2 className="preptime__heading">{getLocalisation().preptime}</h2>
+        <h2 className="preptime__heading">{t.preptime}</h2>
         <Button
-          title={getLocalisation().preptime}
+          title={t.preptime}
           className="preptime__button"
           time={prepShared}
           active={prepShared.selected && !prepShared.paused}
@@ -59,7 +60,7 @@ const PrepTime: FunctionalComponent = () => {
 
   return (
     <section className="preptime">
-      <h2 className="preptime__heading">{getLocalisation().preptime}</h2>
+      <h2 className="preptime__heading">{t.preptime}</h2>
       {
         store.prepTimes.map((time) => (
           <Button

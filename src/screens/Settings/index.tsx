@@ -37,27 +37,28 @@ const requestFormatChange = (newValue: string, store: StoreContent, dispatch: Di
 
 const Settings: FunctionalComponent = () => {
   const { store, dispatch } = useContext(Context);
+  const t = getLocalisation();
 
   return (
     <main className="screen screen--settings">
       <Navbar />
       <Radio
-        label={`${getLocalisation().language}:`}
+        label={`${t.language}:`}
         options={store.languages}
         onChange={(newValue) => setActiveOption(newValue, dispatch, 'SET_LANGUAGE')}
       />
       <Radio
-        label={`${getLocalisation().themeColour}:`}
+        label={`${t.themeColour}:`}
         options={store.themes}
         onChange={(newValue) => setActiveOption(newValue, dispatch, 'SET_THEME')}
       />
       <Radio
-        label={`${getLocalisation().format}:`}
+        label={`${t.format}:`}
         options={store.formats}
         onChange={(newValue) => requestFormatChange(newValue, store, dispatch)}
       />
       <Radio
-        label={`${getLocalisation().mode}:`}
+        label={`${t.mode}:`}
         options={store.modes}
         onChange={(newValue) => setActiveOption(newValue, dispatch, 'SET_MODE')}
       />
@@ -65,10 +66,10 @@ const Settings: FunctionalComponent = () => {
       {store.pendingFormat !== null && (
         <Dialog
           cancel={{
-            title: getLocalisation().cancel,
+            title: t.cancel,
           }}
           confirm={{
-            title: getLocalisation().ok,
+            title: t.ok,
             onClick: () => dispatch({
               type: 'SET_FORMAT',
               payload: store.pendingFormat,
@@ -80,7 +81,7 @@ const Settings: FunctionalComponent = () => {
           })}
         >
           <p>
-            {getLocalisation().formatChangeConfirm}
+            {t.formatChangeConfirm}
           </p>
         </Dialog>
       )}
